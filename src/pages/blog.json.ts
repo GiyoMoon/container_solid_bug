@@ -1,8 +1,7 @@
 import { type CollectionEntry, getCollection } from 'astro:content'
 import { type APIRoute } from 'astro'
 import { experimental_AstroContainer as AstroContainer } from 'astro/container'
-import { getContainerRenderer } from '@astrojs/solid-js'
-import { loadRenderers } from 'astro:container'
+import solidRenderer from '@astrojs/solid-js/server.js'
 
 interface SearchEntry {
   slug: string
@@ -14,8 +13,8 @@ const blogPages = await getCollection('blogs')
 async function createSearchEntry(
   page: CollectionEntry<'blogs'>,
 ): Promise<SearchEntry> {
-  const renderers = await loadRenderers([getContainerRenderer()])
-  const container = await AstroContainer.create({ renderers })
+  const container = await AstroContainer.create()
+  container.addServerRenderer({ renderer: solidRenderer })
   const { Content } = await page.render()
   const body = await container.renderToString(Content, {
     props: {
